@@ -86,7 +86,7 @@ services:
 
   transformer:
     build:
-      context: ./python
+      context: ./transformer
       dockerfile: Dockerfile
     container_name: transformer
     environment:
