@@ -12,6 +12,24 @@ services:
     networks:
       - nifi-network
 
+  registry:
+    hostname: registry
+    container_name: registry
+    image: apache/nifi-registry:1.22.0
+    restart: on-failure
+    ports:
+      - "18080:18080"
+    environment:
+      - LOG_LEVEL=INFO
+      - NIFI_REGISTRY_DB_DIR=/opt/nifi-registry/nifi-registry-current/database
+      - NIFI_REGISTRY_FLOW_PROVIDER=file
+      - NIFI_REGISTRY_FLOW_STORAGE_DIR=/opt/nifi-registry/nifi-registry-current/flow_storage
+    volumes:
+      - ./nifi_registry/database:/opt/nifi-registry/nifi-registry-current/database
+      - ./nifi_registry/flow_storage:/opt/nifi-registry/nifi-registry-current/flow_storage
+    networks:
+      - nifi-network
+
   nifi:
     hostname: nifi
     container_name: nifi
@@ -86,7 +104,7 @@ services:
 
   transformer:
     build:
-      context: ./transformer
+      context: ./python
       dockerfile: Dockerfile
     container_name: transformer
     environment:
@@ -97,7 +115,7 @@ services:
       - KAFKA_CONSUMER_GROUP_ID=${KAFKA_CONSUMER_GROUP_ID}
     networks:
       - nifi-network
-
+      
 networks:
   nifi-network:
     driver: bridge
